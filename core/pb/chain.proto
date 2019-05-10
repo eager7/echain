@@ -1,0 +1,69 @@
+syntax = "proto3";
+package pb;
+
+enum Id {
+    SignatureType   = 0;
+    TransactionType = 1;
+    HeaderType      = 2;
+    BlockType       = 3;
+    ReceiptType     = 4;
+}
+
+/**
+** Signature Info
+*/
+message Signature {
+    bytes       PubKey      = 1;
+    bytes       SigData     = 2;
+}
+
+/**
+** Transaction Info
+*/
+message Transaction {
+    uint32      version     = 1;
+    bytes       ChainID     = 2;
+    bytes       from        = 4;
+    bytes       to          = 6;
+    bytes       payload     = 7;
+    int64       timestamp   = 9;
+    Signature   sign        = 10;
+    bytes       hash        = 11;
+}
+
+/**
+** receipt info
+*/
+message Receipt {
+    bytes       From        =1;
+    bytes       To          =2;
+    bytes       Amount      =3;
+    int64       Timestamp   =4;
+    bytes       Result      =5;
+    bytes       Hash        =6;
+}
+/**
+** Header info
+*/
+message Header {
+    uint32          version             = 1;
+    bytes           ChainID             = 2;
+    int64           timestamp           = 3;
+    uint64          height              = 4;
+    bytes           prev_hash           = 6;
+    bytes           merkle_hash         = 7;
+    bytes           state_hash          = 8;
+    bytes           receipt_hash        = 12;
+    bytes           bloom               = 9;
+    bytes           hash                = 10;
+    Signature       sign                = 11;
+}
+
+/**
+** Block info
+*/
+message Block {
+    Header          header                   = 1;
+    uint64          TxsCount                 = 2;
+    repeated        Transaction transactions = 4;
+}
