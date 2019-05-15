@@ -8,7 +8,7 @@ BUILD_TIME=`date +%Y%m%d%H%M%S`
 # Setup the -ldflags option for go build here, interpolate the variable values
 LDFLAGS=-ldflags "-X main.Version=${GITTAG} -X main.Build_Time=${BUILD_TIME} -s -w"
 
-default: local
+default: mod
 
 mod:
 	export GOPROXY="https://athens.azurefd.net" && GO111MODULE=on go build ${LDFLAGS} -o build/${TARGET} ${SRC}

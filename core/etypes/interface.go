@@ -1,4 +1,4 @@
-package types
+package etypes
 
 import "github.com/eager7/echain/core/pb"
 
