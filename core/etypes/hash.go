@@ -52,3 +52,4 @@ func (h *Hash) Equals(b *Hash) bool {
 	}
 	return bytes.Equal(h[:], b[:])
 }
+

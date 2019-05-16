@@ -1,11 +1,9 @@
-package tendermint
+package abci
 
 import (
-	"encoding/binary"
 	"errors"
 	"fmt"
 	"github.com/eager7/elog"
-	"github.com/tendermint/iavl"
 	"github.com/tendermint/tendermint/abci/client"
 	"github.com/tendermint/tendermint/abci/server"
 	"github.com/tendermint/tendermint/abci/types"
@@ -17,10 +15,10 @@ import (
 var log = elog.NewLogger("tm", elog.InfoLevel)
 
 type EChainApp struct {
-	State iavl.Node
 	types.Application
-	Server common.Service
-	Client abcicli.Client
+	Server  common.Service
+	Client  abcicli.Client
+	AppHash []byte
 }
 
 func Initialize(sock string) (*EChainApp, error) {
@@ -86,7 +84,19 @@ func (e *EChainApp) Query(req types.RequestQuery) types.ResponseQuery {
 
 func (e *EChainApp) CheckTx(tx []byte) types.ResponseCheckTx {
 	log.Info("app check tx:", string(tx))
-	return types.ResponseCheckTx{}
+	return types.ResponseCheckTx{
+		Code:                 0,
+		Data:                 nil,
+		Log:                  "",
+		Info:                 "echain tx check",
+		GasWanted:            0,
+		GasUsed:              0,
+		Tags:                 nil,
+		Codespace:            "",
+		XXX_NoUnkeyedLiteral: struct{}{},
+		XXX_unrecognized:     nil,
+		XXX_sizecache:        0,
+	}
 } // Validate a tx for the mempool
 
 func (e *EChainApp) InitChain(req types.RequestInitChain) types.ResponseInitChain {
@@ -95,13 +105,13 @@ func (e *EChainApp) InitChain(req types.RequestInitChain) types.ResponseInitChai
 } // Initialize blockchain with validators and other info from TendermintCore
 
 func (e *EChainApp) BeginBlock(req types.RequestBeginBlock) types.ResponseBeginBlock {
-	log.Info("app begin block:", req.String())
+	log.Info("app begin block:", req.Header.NumTxs, req.Header.Height, req.Header.AppHash)
+	e.AppHash = req.Header.AppHash
 	return types.ResponseBeginBlock{}
 } // Signals the beginning of a block
 
 func (e *EChainApp) DeliverTx(tx []byte) types.ResponseDeliverTx {
 	log.Info("app deliver tx:", string(tx))
-	e.Size++
 	return types.ResponseDeliverTx{}
 } // Deliver a tx for full processing
 
@@ -112,9 +122,7 @@ func (e *EChainApp) EndBlock(req types.RequestEndBlock) types.ResponseEndBlock {
 
 func (e *EChainApp) Commit() types.ResponseCommit {
 	log.Info("app commit")
-	appHash := make([]byte, 8)
-	binary.PutVarint(appHash, e.Size)
 	return types.ResponseCommit{
-		Data: appHash,
+		Data: e.AppHash,
 	}
 } // Commit the state and return the application Merkle root hash

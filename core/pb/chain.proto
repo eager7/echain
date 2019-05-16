@@ -25,6 +25,7 @@ message Transaction {
     bytes       ChainID     = 2;
     bytes       from        = 4;
     bytes       to          = 6;
+    bytes       amount      = 5;
     bytes       payload     = 7;
     int64       timestamp   = 9;
     Signature   sign        = 10;

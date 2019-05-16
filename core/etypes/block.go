@@ -56,7 +56,29 @@ func (b *Block) Serialize() ([]byte, error) {
 }
 
 func (b *Block) Deserialize(data []byte) error {
-
+	var pB pb.Block
+	if err := proto.Unmarshal(data, &pB); err != nil {
+		return errors.New("block unmarshal err:" + err.Error())
+	}
+	hd, err := pB.Header.Marshal()
+	if err != nil {
+		return errors.New("header marshal err:" + err.Error())
+	}
+	if err := b.Header.Deserialize(hd); err != nil {
+		return errors.New("header deserialize err:" + err.Error())
+	}
+	b.CountTxs = pB.TxsCount
+	for _, t := range pB.Transactions {
+		td, err := t.Marshal()
+		if err != nil {
+			return errors.New("block tx marshal err:" + err.Error())
+		}
+		var tx Transaction
+		if err := tx.Deserialize(td); err != nil {
+			return errors.New("block tx deserialize err:" + err.Error())
+		}
+		b.Transactions = append(b.Transactions, &tx)
+	}
 	return nil
 }
 

@@ -1,4 +1,4 @@
-package tendermint
+package abci
 
 import (
 	"encoding/json"

@@ -3,6 +3,7 @@ package etypes
 import (
 	"errors"
 	"github.com/eager7/echain/core/pb"
+	"github.com/golang/protobuf/proto"
 	"math/big"
 )
 

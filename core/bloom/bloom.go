@@ -2,7 +2,7 @@ package bloom
 
 import (
 	"fmt"
-	"github.com/eager7/echain/common/hash"
+	"github.com/eager7/echain/common"
 	"math/big"
 )
 
@@ -53,7 +53,7 @@ func (b Bloom) Big() *big.Int {
 }
 
 func bloom(b []byte) *big.Int {
-	b = hash.SingleHash(b[:])
+	b = common.SingleHash(b[:])
 	r := new(big.Int)
 	for i := 0; i < BloomHashCycle; i += 2 {
 		t := big.NewInt(1)

@@ -45,7 +45,21 @@ func (h *Header) Serialize() ([]byte, error) {
 }
 
 func (h *Header) Deserialize(data []byte) error {
-
+	var ph pb.Header
+	if err := proto.Unmarshal(data, &ph); err != nil {
+		return errors.New("header unmarshal err:" + err.Error())
+	}
+	h.Version = ph.Version
+	h.ChainID = HashSetBytes(ph.ChainID)
+	h.TimeStamp = ph.Timestamp
+	h.Height = ph.Height
+	h.PrevHash = HashSetBytes(ph.PrevHash)
+	h.MerkleHash = HashSetBytes(ph.MerkleHash)
+	h.StateHash = HashSetBytes(ph.StateHash)
+	h.ReceiptHash = HashSetBytes(ph.ReceiptHash)
+	h.Bloom = bloom.NewBloom(ph.Bloom)
+	h.Signatures = Signature{PubKey: ph.Sign.PubKey, SigData: ph.Sign.SigData}
+	h.Hash = HashSetBytes(ph.Hash)
 	return nil
 }
 
