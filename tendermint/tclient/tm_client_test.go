@@ -31,7 +31,7 @@ func TestSendTx(t *testing.T) {
 
 func TestQueryBlock(t *testing.T) {
 	cli := Initialize("tcp://0.0.0.0:26657")
-	block, txs, err := cli.QueryBlock(1915)
+	block, txs, err := cli.QueryBlock(2127)
 	if err != nil {
 		t.Fatal(err)
 	}
