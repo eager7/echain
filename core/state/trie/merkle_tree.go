@@ -91,7 +91,7 @@ func GetMerkleRoot(hashes []etypes.Hash) (etypes.Hash, error) {
 		return etypes.Hash{}, nil
 	}
 	if len(hashes) == 1 {
-		return hashes[0], nil
+		hashes = append(hashes, hashes[0])
 	}
 
 	return NewMerkleTree(hashes).Root.hash, nil
