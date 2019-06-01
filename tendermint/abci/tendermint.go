@@ -1,6 +1,7 @@
 package abci
 
 import (
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"github.com/eager7/elog"
@@ -16,9 +17,10 @@ var log = elog.NewLogger("tm", elog.InfoLevel)
 
 type EChainApp struct {
 	types.Application
-	Server  common.Service
-	Client  abcicli.Client
-	AppHash []byte
+	Server    common.Service
+	Client    abcicli.Client
+	deliverTx int64
+	AppHash   []byte
 }
 
 func Initialize(sock string) (*EChainApp, error) {
@@ -112,6 +114,7 @@ func (e *EChainApp) BeginBlock(req types.RequestBeginBlock) types.ResponseBeginB
 
 func (e *EChainApp) DeliverTx(tx []byte) types.ResponseDeliverTx {
 	log.Info("app deliver tx:", string(tx))
+	e.deliverTx++
 	return types.ResponseDeliverTx{}
 } // Deliver a tx for full processing
 
@@ -122,7 +125,7 @@ func (e *EChainApp) EndBlock(req types.RequestEndBlock) types.ResponseEndBlock {
 
 func (e *EChainApp) Commit() types.ResponseCommit {
 	log.Info("app commit")
-	return types.ResponseCommit{
-		Data: e.AppHash,
-	}
+	appHash := make([]byte, 8)
+	binary.PutVarint(appHash, e.deliverTx)
+	return types.ResponseCommit{Data: appHash}
 } // Commit the state and return the application Merkle root hash
